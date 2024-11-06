@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, loginUser , getAllUsers} = require('../controller/users');
+const { registerUser, loginUser , logoutUser, getAllUsers} = require('../controller/users');
 const { validateUser , validateLogin} = require('../middleware/validator/users');
 const allowedTo = require('../middleware/auth/checkRole');
 const userRoles = require('../utils/userRoles');
@@ -15,6 +15,9 @@ usersRouter.post('/register',validateUser, uploadAvatar.single('avatar'),registe
 
 /* login user */
 usersRouter.post('/login', validateLogin, loginUser);
+
+/* logout user */
+usersRouter.get('/logout', logoutUser);
 
 
 module.exports = usersRouter;

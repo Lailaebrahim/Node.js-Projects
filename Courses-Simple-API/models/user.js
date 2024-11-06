@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
     minlength: 8,
     maxlength: 1024,
   },
-  token: {
+  refreshToken: {
     type: String,
     default: "Login To Get Authorization Token",
   },

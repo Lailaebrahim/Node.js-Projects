@@ -4,8 +4,10 @@ const asyncHandler = require("express-async-handler");
 const appError = require("../utils/error");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
-const generateToken = require("../utils/token");
-const path = require("path");
+const generateTokens = require("../utils/token");
+const { log } = require("console");
+const jwt = require("jsonwebtoken");
+
 
 const getAllUsers = asyncHandler(async (req, res, next) => {
     const result = validationResult(req);
@@ -45,11 +47,34 @@ const loginUser = asyncHandler(async (req, res, next) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid)
         return next(new appError().createError(400, "Invalid password"));
-    const token = generateToken(user);
-    user.token = token;
+    const { accesstoken, refreshtoken } = generateTokens(user);
+    user.refreshToken = refreshtoken;
     user.save();
-    res.jsend.success({ email: user.email, token: user.token });
+    res.cookie("refreshToken", refreshtoken, { httpOnly: true});
+    res.jsend.success({ email: user.email, accessToken: accesstoken});
 });
 
+const logoutUser = asyncHandler(async (req, res, next) => {
+    const refreshToken = req.cookies.refreshToken;
+    console.log(refreshToken);
+    if (!refreshToken)
+        return next(new appError().createError(403, "Forbidden"));
+    try{
+        const decodedJwt = jwt.verify(refreshToken, process.env.Refresh_JWT_SECRET);
+        const user = await User.findById(decodedJwt._id);
+        if (!user)
+            return next(new appError().createError(403, "Forbidden"));
+        user.refreshToken = "";
+        user.save();
+        res.clearCookie("refreshToken", { httpOnly: true});
+        res.jsend.success("Logged out successfully");
+    } catch(err) {
+        if (err.name === 'TokenExpiredError') {
+            return next(new appError().createError(401, "Refresh token expired , So You are logged out"));
+        } else {
+            return next(new appError().createError(403, "Forbidden"));
+        }
+    }
+});
 
-module.exports = { getAllUsers, registerUser, loginUser };
+module.exports = { getAllUsers, registerUser, loginUser, logoutUser };

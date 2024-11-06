@@ -25,12 +25,12 @@ const validateUser = checkSchema({
 
 const validateLogin = checkSchema({
     email:{
-        in : ['body'],
+        in : [ 'formData'],
         errorMessage: 'Email is required',
         isEmail: true,
     },
     password:{
-        in : ['body'],
+        in : [ 'formData'],
         errorMessage: 'Password is required',
         isString: true,
     }
