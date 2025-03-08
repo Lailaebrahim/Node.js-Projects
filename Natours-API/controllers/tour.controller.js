@@ -1,5 +1,11 @@
 import Tour from "../models/tour.model.js";
 
+export const aliasTopFiveCheapTours = (req, res, next) => {
+    req.query.limit = 5;
+    req.query.sort = "-ratingAverage,price";
+    req.query.fields = "name,price,ratingAverage,summary,difficulty";
+    next();
+};
 
 export const getAllTours = async (req, res) => {
     try {
@@ -7,12 +13,45 @@ export const getAllTours = async (req, res) => {
         const queryObj = { ...req.query };
         const filterMethods = ["page", "sort", "limit", "fields"];
         filterMethods.forEach((el) => delete queryObj[el]);
+
+        // Advanced filtering to allow for greater than, less than, etc
+        let queryStr = JSON.stringify(queryObj);
+        queryStr = queryStr.replace(/\b(gte|gt|lt|lte)\b/g, match => `$${match}`);
+
         // create query object
         // query object is an object that inherits from the  query object prototype
         // so we can chain methods on it like find, sort, limit, etc
         // once we use await or exec, the query object will be executed
-        // amd the return is an array of documents that match the query
-        const query = Tour.find(queryObj);
+        // and the return is an array of documents that match the query
+        let query = Tour.find(JSON.parse(queryStr));
+
+        // Sorting
+        if (req.query.sort) {
+            const sortBy = req.query.sort.split(",").join(" ");
+            query = query.sort(sortBy);
+        } else {
+            query = query.sort("-createdAt");
+        }
+
+        // selecting
+        if (req.query.fields) {
+            const fields = req.query.fields.split(',').join(' ');
+            query = query.select(fields);
+        } else {
+            query = query.select('-__v');
+        }
+
+        // pagination
+        const page = req.query.page * 1 || 1;
+        const limit = req.query.limit * 1 || 10;
+        const skip = (page - 1) * limit;
+        query = query.skip(skip).limit(limit);
+
+        if (req.query.page) {
+            const toursCount = await Tour.countDocuments();
+            if (skip >= toursCount) throw new Error('This page does not exist');
+        }
+
         // Execute query
         const tours = await query;
 
@@ -26,7 +65,7 @@ export const getAllTours = async (req, res) => {
     } catch (error) {
         res.status(404).json({
             status: "fail",
-            message: error,
+            message: error.message,
         });
     }
 };

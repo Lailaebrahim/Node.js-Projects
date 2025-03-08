@@ -4,6 +4,10 @@ import * as tourController from "../controllers/tour.controller.js";
 const tourRouter = express.Router();
 
 tourRouter
+    .route("/top-5-cheap")
+    .get(tourController.aliasTopFiveCheapTours, tourController.getAllTours);
+
+tourRouter
     .route("/")
     .get(tourController.getAllTours)
     .post(tourController.createTour);

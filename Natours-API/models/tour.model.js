@@ -47,7 +47,9 @@ const tourSchema = new Schema({
     images: [String],
     createdAt: {
         type: Date,
-        default: Date.now()
+        default: Date.now(),
+        // to exclude this field from the output
+        select: false
     },
     startDates: [Date]
 });
