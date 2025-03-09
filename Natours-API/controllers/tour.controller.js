@@ -14,7 +14,6 @@ export const getAllTours = async (req, res) => {
         const features = new APIFeatures(Tour.find(), req.query).filter().sort().limitFields().paginate();
         // get the query from the features object
         const query = features.query;
-        console.log(query.options);
         // execute query
         const tours = await query;
 
