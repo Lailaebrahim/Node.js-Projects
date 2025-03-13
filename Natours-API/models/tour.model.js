@@ -74,6 +74,7 @@ const tourSchema = new Schema({
         default: false
     }
 }, {
+    // this will force add all the virtual properties to the output even if they are not defined in the fields selected in the query
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
 });
@@ -91,26 +92,26 @@ tourSchema.pre('save', function (next) {
 })
 
 // post save hook/middleware
-tourSchema.post('save', function (doc, next) {
-    // console.log(doc);
-    next();
-})
+// tourSchema.post('save', function (doc, next) {
+//     // console.log(doc);
+//     next();
+// })
 
 // query middleware
 
 // pre find hook/middleware - using regex to match all the find methods
 tourSchema.pre(/^find/, function (next) {
     this.find({ secretTour: { $ne: true } });
-    this.start = Date.now();
+    // this.start = Date.now();
     next();
 })
 
 // post find hook/middleware
-tourSchema.post(/^find/, function (docs, next) {
-    // console.log(`Query took ${Date.now() - this.start} milliseconds`);
-    // console.log(docs);
-    next();
-});
+// tourSchema.post(/^find/, function (docs, next) {
+//     // console.log(`Query took ${Date.now() - this.start} milliseconds`);
+//     // console.log(docs);
+//     next();
+// });
 
 // aggregation middleware
 // It runs before any aggregation pipeline is executed on the Tour model.
