@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import User from '../models/user.model.js';
 import catchAsync from '../utils/catchAsync.js';
 import AppError from '../utils/appError.js';
@@ -66,17 +66,17 @@ export const forgetPassword = catchAsync(async (req, res, next) => {
     // as the confirmPassword field that we set to undefined in user creation
     await user.save({ validateBeforeSave: false });
 
-    const restURL = `${req.protocol}://${req.host}/api/v1/users/reset-password/${resetToken}`;
+    const restURL = `${req.protocol}://${req.hostname}/api/v1/users/reset-password/${resetToken}`;
 
-    await sendEmail({
-        email: user.email,
-        subject: 'Reset Password',
-        message: `If you forget your password, please submit a PATCH request with your new password and passwordConfirm to: ${restURL}`
-    });
+    // await sendEmail({
+    //     email: user.email,
+    //     subject: 'Reset Password',
+    //     message: `If you forget your password, please submit a PATCH request with your new password and passwordConfirm to: ${restURL}`
+    // });
 
     res.status(200).json({
         status: 'success',
-        message: 'Token sent to email'
+        message: `If you forget your password, please submit a PATCH request with your new password and passwordConfirm to: ${restURL}`
     });
 
 });
@@ -84,7 +84,7 @@ export const forgetPassword = catchAsync(async (req, res, next) => {
 export const resetPassword = catchAsync(async (req, res, next) => {
     const { token } = req.params;
     const { password, confirmPassword } = req.body;
-    const hashedToken = crypto.createHash('sha256').update(token).digest('hex').toString();
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
     const user = await User.findOne({ passwordResetToken: hashedToken, passwordResetExpires: { $gt: Date.now() } });
     if (!user) {
         return next(new AppError('Token is invalid or has expired', 400));

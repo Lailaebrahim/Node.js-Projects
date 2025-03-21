@@ -77,7 +77,7 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
 // but still it must be hashed before saving to the database
 userSchema.methods.generateResetPasswordToken = function () {
     const token = crypto.randomBytes(32).toString('hex');
-    this.passwordResetToken = crypto.createHash('sha256').update(token).digest('hex').toString();
+    this.passwordResetToken = crypto.createHash('sha256').update(token).digest('hex');
     this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
     return token;
 }
