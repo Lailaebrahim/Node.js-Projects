@@ -41,6 +41,11 @@ const userSchema = mongoose.Schema({
     passwordChangeAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
+    active: {
+        type: Boolean,
+        default: true,
+        select: false
+    }
 });
 
 // encrypting the password before saving it to the database
@@ -61,9 +66,14 @@ userSchema.pre('save', function (next) {
     next();
 });
 
-userSchema.methods.validatePassword = async function (candidatePassword, userPassword) {
-    return await bcrypt.compare(candidatePassword, userPassword);
-}
+userSchema.pre(/^find/, function (next) {
+    this.find({ active: { $ne: false } });
+    next();
+});
+
+userSchema.methods.validatePassword = async function (candidatePassword) {
+    return await bcrypt.compare(candidatePassword, this.password);
+};
 
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
     if (!this.passwordChangeAt) return false;
