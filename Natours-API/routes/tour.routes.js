@@ -1,8 +1,12 @@
 import express from "express";
 import * as tourController from "../controllers/tour.controller.js";
 import * as authController from "../controllers/auth.controller.js";
+import reviewRouter from "./review.routes.js";
+// import * as reviewController from "../controllers/review.controller.js";
 
 const tourRouter = express.Router();
+
+tourRouter.use("/:tourId/reviews", reviewRouter);
 
 tourRouter
     .route("/top-5-cheap")
@@ -26,5 +30,13 @@ tourRouter
         authController.restrictTo("admin", "lead-guide"),
         tourController.deleteTour
     );
+
+// tourRouter
+//     .route("/:tourId/reviews")
+//     .post(
+//         authController.protect,
+//         authController.restrictTo("user"),
+//         reviewController.createReview
+//     );
 
 export default tourRouter;

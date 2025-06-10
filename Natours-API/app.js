@@ -5,11 +5,13 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
+import hpp from 'hpp';
 import AppError from './utils/appError.js';
 import globalErrorHandler from './controllers/error.controller.js';
 import tourRouter from './routes/tour.routes.js';
 import userRouter from './routes/user.routes.js';
-import { whitelist } from 'validator';
+import reviewRouter from './routes/review.routes.js';
+// import { whitelist } from 'validator';
 
 // ================== Global Middlewares ==================
 
@@ -43,7 +45,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(mongoSanitize());
 
 // middleware to protect from xss attacks
-app, use(xss());
+app.use(xss());
 
 // middleware to protect from parameter pollution
 // whitelist is used to allow duplicate query parameters
@@ -67,6 +69,7 @@ app.use(express.static(`${__dirname}/public`));
 // adding routes
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 // middleware to handle unhandled routes
 app.all('*', (req, res, next) => {
