@@ -1,0 +1,23 @@
+{
+  "name": "prisma-rest-api-books-resource",
+  "version": "1.0.0",
+  "description": "A REST API Resource for Books using Prisma ORM",
+  "license": "ISC",
+  "author": "Laila Ebrahim",
+  "scripts": {
+    "runDev": "nodemon ./src/server.ts",
+    "build": "tsc",
+    "dev": "nodemon ./src/script.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.7.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.7.0",
+    "express": "^5.1.0"
+  }
+}
