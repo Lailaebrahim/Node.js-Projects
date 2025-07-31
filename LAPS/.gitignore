@@ -1,0 +1,7 @@
+node_modules/**
+/dist
+*.env
+notes.md
+config.ts
+package-lock.json
+/helpers
