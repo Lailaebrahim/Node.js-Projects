@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/v1', indexRouter);
 // catch-all for unhandled routes
 app.use((req, res, next)=>{
-    next(new AppError("Not Found", 404, "error", true));
+    next(new AppError(`URL ${req.originalUrl} Not Found`, 404, "error", true));
 })
 app.use(globalErrorHandler);
 

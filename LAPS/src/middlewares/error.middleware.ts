@@ -7,7 +7,7 @@ const handleCastErrorDB = (err: any) => {
 
 const handleValidationErrorDB = (err: any) => {
   const errors = Object.values(err.errors).map((el: any) => el.message);
-  return new AppError(`Invalid Input Data \n${errors.join("\n")}`, 400);
+  return new AppError(`Invalid Input Data: ${errors.join(", ")}`, 400);
 };
 
 const handleDuplicateErrorDB = (err: any) => {
@@ -20,6 +20,14 @@ const handleDuplicateErrorDB = (err: any) => {
     400
   );
 };
+
+const handleJsonWebTokenError = (err: any)=>{
+  return new AppError("Invalid Token", 401);
+}
+
+const handleTokenExpiredError = (err: any)=>{
+  return new AppError("Token Expired, Login Again !", 401);
+}
 
 const sendErrorDevelopment = (err: AppError, res: Response) => {
   res.status(err.statusCode || 500).json({
@@ -50,6 +58,7 @@ const globalErrorHandler = (
   res: Response,
   next: NextFunction
 ) => {
+  console.log(err);
   if (process.env.NODE_ENV === "development") {
     sendErrorDevelopment(err, res);
   } else if (process.env.NODE_ENV === "production") {
@@ -63,6 +72,13 @@ const globalErrorHandler = (
     if (err.code === 11000) {
       error = handleDuplicateErrorDB(error);
     }
+    if(err.name === "JsonWebTokenError") {
+      error = handleJsonWebTokenError(error);
+    }
+    if(err.name === "TokenExpiredError") {
+      error = handleTokenExpiredError(error);
+    }
+
     sendErrorProduction(error, res);
   }
 };

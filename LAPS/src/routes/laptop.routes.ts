@@ -1,12 +1,14 @@
 import router from 'express';
 import laptopController from '../controllers/laptop.controller.js'
 import laptopMiddleware from '../middlewares/laptop.middleware.js';
+import {checkAuth} from "../middlewares/auth.middleware.js";
+
 
 const laptopRouter = router.Router();
 
 laptopRouter
 .route('/stats')
-.get(laptopController.getLaptopsStats);
+.get(checkAuth, laptopController.getLaptopsStats);
 
 laptopRouter
 .route('/top-5-advanced')
