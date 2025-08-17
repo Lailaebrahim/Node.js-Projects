@@ -3,7 +3,6 @@ import cors from 'cors'
 import dotenv from 'dotenv';
 import indexRouter from './routes/index.router.js';
 import globalErrorHandler from "./middlewares/error.middleware.js"
-import { request } from 'http';
 import AppError from './utils/appError.js';
 
 

@@ -1,5 +1,5 @@
 import app from "./app.js";
-import mongoose from "mongoose";
+import DatabaseClient from "./utils/dbClient.js";
 
 process.on("uncaughtException", (err) => {
   console.log("UNCAUGHT EXCEPTION!!!\nShutting Down");
@@ -7,22 +7,12 @@ process.on("uncaughtException", (err) => {
   process.exit(1);
 });
 
-const DB = process.env.DB;
-mongoose
-  .connect(DB as string)
-  .then((connection) => {
-    console.log(
-      "Database connection successful",
-      connection.connections[0].name
-    );
-  })
-  .catch((error) => {
-    console.error("Database connection error:", error);
-  });
 
 const PORT = process.env.PORT;
 const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  const dbClient = new DatabaseClient(String(process.env.DB));
+  dbClient.connect();
 });
 
 process.on("unhandledRejection", (err: any) => {
