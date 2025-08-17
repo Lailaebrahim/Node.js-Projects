@@ -2,6 +2,7 @@ import router from 'express';
 import laptopController from '../controllers/laptop.controller.js'
 import laptopMiddleware from '../middlewares/laptop.middleware.js';
 import {checkAuth} from "../middlewares/auth.middleware.js";
+import uploadManual from "../utils/lapManualFileUpload.js";
 
 
 const laptopRouter = router.Router();
@@ -17,14 +18,13 @@ laptopRouter
 laptopRouter
 .route('/')
 .get(laptopController.getAllLaptops)
-.post(laptopController.createLaptop);
+.post(uploadManual.single('manual'), laptopController.createLaptop);
 
 laptopRouter
 .route('/:id')
 .get(laptopController.getLaptopById)
-.patch(laptopController.updateLaptop)
+.patch(uploadManual.single('manual'), laptopController.updateLaptop)
 .delete(laptopController.deleteLaptop);
-
 
 
 export default laptopRouter;
