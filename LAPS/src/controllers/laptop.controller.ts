@@ -4,11 +4,7 @@ import { Request, Response, NextFunction } from "express";
 import APIFeatures from "../utils/apiFeatures.js";
 import AppError from "../utils/appError.js";
 import AIClient from "../utils/aiClient.js";
-import PineconeClient from "../utils/pineconeClient.js";
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { PromptTemplate } from "@langchain/core/prompts";
-import { PineconeStore } from "@langchain/pinecone";
-import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
+
 
 class LaptopController {
   getAllLaptops = expressAsyncHandler(
@@ -222,73 +218,19 @@ class LaptopController {
 
   askAboutLaptop = expressAsyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      // 1- question is in the req.body.question
-      // 2- question need to be emdedded through the ai client gemini api
-      // 3- then the question vector is used to do similarity search to find the vector that semantically contain the answer about that specific laptop
-      // 4- write the prompt template the contain the question and the context
-      // 5- prompt the llm to get the answer
-      // 6- send it back to the user
       const question = String(req.body.question);
-      // console.log(question);
 
-      // const aiClient = new AIClient(String(process.env.GEMINI_API_KEY));
-      // const questionVector = await aiClient.embedText(question);
-
-      // create pinecone vector store for doing the similarity search
-      const pineconeClient = new PineconeClient(
-        String(process.env.PINECONE_API_KEY)
-      );
-      const pineconeIndex = pineconeClient.pinecone.Index(
-        String(process.env.LAPTOPS_MANUAL_FILES_INDEX_NAME)
+      const aiClient = new AIClient(
+        String(process.env.GEMINI_API_KEY),
+        String(process.env.EMBEDDING_MODEL)
       );
 
-      const embeddings = new GoogleGenerativeAIEmbeddings({
-        apiKey: String(process.env.GEMINI_API_KEY),
-        model: String(process.env.EMBEDDING_MODEL),
-      });
-
-      const vectorStore = new PineconeStore(embeddings, {
-        pineconeIndex,
-        maxConcurrency: 5,
-      });
-
-      const retrievedDocs = await vectorStore.similaritySearch(question, 1);
-      const docsContent = retrievedDocs
-        .map((doc) => doc.pageContent)
-        .join("\n");
-      console.log("Raw retrieved doc content:", docsContent);
-
-      // create llm
-      const llm = new ChatGoogleGenerativeAI({
-        apiKey: String(process.env.GEMINI_API_KEY),
-        model: String(process.env.LLM_MODEL),
-        temperature: 0,
-      });
-
-      // define prompt
-      const promptTemplate = new PromptTemplate({
-        inputVariables: ["question", "context"],
-        template: `
-          You are an assistant to answer questions about laptops. Answer the question based on the context provided which is a data about the laptop read from its manual file. If you don't know the answer, say that you didn't find the exact answer to the question and provide a general answer based on your knowledge.
-          
-          Important: Provide your response as plain text only, without any markdown formatting, bold text, italics, or special characters.
-          
-          Context: {context}
-          Question: {question}
-        `,
-      });
-
-      // create the template
-      const messages = await promptTemplate.invoke({
-        question: question,
-        context: docsContent,
-      });
-
-      const answer = await llm.invoke(messages);
+      const answer = await aiClient.answerLaptopQuestion(question);
+      // console.log("Answer from AI:", answer);
 
       res.status(200).json({
         status: "success",
-        data: answer.content,
+        data: answer,
       });
     }
   );

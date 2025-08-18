@@ -5,7 +5,7 @@ import { Worker } from "bullmq";
 import { readFileSync } from "fs";
 import pdfParser from "pdf-parse";
 import { fileURLToPath } from "url";
-import { extname, join, dirname } from "path";
+import { join, dirname } from "path";
 import PineconeClient from "../utils/pineconeClient.js";
 import AIClient from "../utils/aiClient.js";
 import DatabaseClient from "../utils/dbClient.js";
@@ -29,7 +29,7 @@ const manualFileProcessingWorker = new Worker(
 
     try {
       // init ai client and send text to gemini for embedding
-      const aiClient = new AIClient(String(process.env.GEMINI_API_KEY));
+      const aiClient = new AIClient(String(process.env.GEMINI_API_KEY), String(process.env.EMBEDDING_MODEL));
       const response = await aiClient.embedText(data.text);
 
       // init pinecone client and check if index exists
