@@ -30,10 +30,7 @@ const manualFileProcessingWorker = new Worker(
     try {
       // init ai client and send text to gemini for embedding
       const aiClient = new AIClient(String(process.env.GEMINI_API_KEY));
-      const response = await aiClient.GoogleGenAI.models.embedContent({
-        model: "gemini-embedding-001",
-        contents: data.text,
-      });
+      const response = await aiClient.embedText(data.text);
 
       // init pinecone client and check if index exists
       const pineconeClient = new PineconeClient(
@@ -59,8 +56,8 @@ const manualFileProcessingWorker = new Worker(
       const records = [
         {
           id: ID,
-          values: response?.embeddings?.[0]?.values || [],
-          metadata: { fileName, id: ID },
+          values: response,
+          metadata: { fileName, id: ID, text: data.text },
         },
       ];
       const index = pineconeClient.pinecone.Index(indexName);
