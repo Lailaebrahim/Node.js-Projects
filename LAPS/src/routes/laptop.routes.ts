@@ -26,5 +26,9 @@ laptopRouter
 .patch(uploadManual.single('manual'), laptopController.updateLaptop)
 .delete(laptopController.deleteLaptop);
 
+laptopRouter
+.route('/ask')
+.post(laptopController.askAboutLaptop);
+
 
 export default laptopRouter;
