@@ -6,7 +6,7 @@ A comprehensive Node.js/TypeScript application that provides intelligent laptop 
 
 - **Laptop Management**: Complete CRUD operations for laptop inventory
 - **AI-Powered Q&A**: Ask questions about specific laptop manuals using RAG (Retrieval-Augmented Generation)
-- **PDF Manual Processing**: Automatic text extraction, chunking, and vectorization
+- **PDF Manual Processing**: Automatic text extraction, and vectorization
 - **Semantic Search**: Find relevant information from laptop manuals using vector similarity
 - **Background Job Processing**: Asynchronous file processing with Redis queues
 - **User Authentication**: JWT-based authentication system
@@ -145,7 +145,7 @@ npm start
 3. **Embedding Generation**: Gemini API creates vector embeddings
 4. **Vector Storage**: Embeddings stored in Pinecone with metadata
 5. **Question Processing**: User questions are embedded and matched
-6. **Context Retrieval**: Relevant chunks retrieved via similarity search
+6. **Context Retrieval**: Relevant docs retrieved via similarity search
 7. **Answer Generation**: Gemini generates contextual responses
 
 ## 🔄 Background Processing
@@ -180,7 +180,7 @@ POST /api/v1/laptop/ask
 }
 ```
 
-## 🛡️ Error Handling
+### Error Handling
 
 - Comprehensive global error handler
 - Graceful app exiting on unhandled promise rejections and exceptions
