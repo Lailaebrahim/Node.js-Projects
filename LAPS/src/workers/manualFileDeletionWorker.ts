@@ -29,25 +29,18 @@ const manualFileDeletionQueue = new Worker(
     try {
       if (existsSync(filePath)) {
         await unlink(filePath);
-        console.log("file deleted");
+        // console.log("file deleted");
       } else {
-        console.log("File Do Not Exist");
+        // console.log("File Do Not Exist");
       }
 
-      // init pinecone client and check if index exists
-      const pineconeClient = new PineconeClient(
+      // get the pinecone index and delete the vector
+      const index = await new PineconeClient(
         String(process.env.PINECONE_API_KEY)
-      );
-      const indexList = await pineconeClient.pinecone.listIndexes();
-      const indexName = String(process.env.LAPTOPS_MANUAL_FILES_INDEX_NAME);
-      if (!indexList.indexes?.some((index) => index.name === indexName)) {
-            console.log("Pinecone Do Not Exist");
-      }
+      ).getIndex(String(process.env.LAPTOPS_MANUAL_FILES_INDEX_NAME));
 
-      const index = pineconeClient.pinecone.index(indexName);
       await index.deleteOne(ID);
-
-      console.log("Vector deleted successfully.");
+      // console.log("Vector deleted successfully.");
 
       // return the processed fileName and status
       return { status: "processed" };
@@ -58,8 +51,8 @@ const manualFileDeletionQueue = new Worker(
   },
   {
     connection: {
-      host: "localhost",
-      port: 6379,
+      host: String(process.env.REDIS_HOST) || "localhost",
+      port: Number(process.env.REDIS_PORT) || 6379,
     },
   }
 );

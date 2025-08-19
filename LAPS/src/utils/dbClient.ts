@@ -10,12 +10,12 @@ class DatabaseClient {
     async connect(): Promise<void> {
         try {
             const connection = await mongoose.connect(this.DB);
-            console.log(
-                "Database connection successful",
-                connection.connections[0].name
-            );
+            // console.log(
+            //     "Database connection successful",
+            //     connection.connections[0].name
+            // );
         } catch (error) {
-            console.error("Database connection error:", error);
+            // console.error("Database connection error:", error);
             throw error;
         }
     }

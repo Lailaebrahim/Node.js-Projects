@@ -3,7 +3,7 @@ import Laptop from "../models/laptop.model.js";
 import { Request, Response, NextFunction } from "express";
 import APIFeatures from "../utils/apiFeatures.js";
 import AppError from "../utils/appError.js";
-import AIClient from "../utils/aiClient.js";
+import RAGSystem from "../utils/ragSystem.js";
 
 
 class LaptopController {
@@ -220,13 +220,18 @@ class LaptopController {
     async (req: Request, res: Response, next: NextFunction) => {
       const question = String(req.body.question);
 
-      const aiClient = new AIClient(
-        String(process.env.GEMINI_API_KEY),
-        String(process.env.EMBEDDING_MODEL)
-      );
+      const ragConfig = {
+        apiKey: String(process.env.GEMINI_API_KEY),
+        embeddingModel: String(process.env.EMBEDDING_MODEL),
+        llmModel: String(process.env.LLM_MODEL),
+        pineconeApiKey: String(process.env.PINECONE_API_KEY),
+        pineconeIndexName: String(process.env.LAPTOPS_MANUAL_FILES_INDEX_NAME),
+      };
 
-      const answer = await aiClient.answerLaptopQuestion(question);
-      // console.log("Answer from AI:", answer);
+      const ragSystem = new RAGSystem(ragConfig);
+
+      // console.log("Asking AI about laptop:", question);
+      const answer = await ragSystem.answerLaptopQuestion(question);
 
       res.status(200).json({
         status: "success",
