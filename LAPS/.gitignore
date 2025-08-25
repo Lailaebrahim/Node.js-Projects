@@ -5,3 +5,7 @@ notes.md
 config.ts
 package-lock.json
 /helpers
+src/uploads/** 
+src/types/**
+*.pdf
+test
