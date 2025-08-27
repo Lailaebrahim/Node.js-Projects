@@ -3,9 +3,11 @@ import { Request, Response, NextFunction } from "express";
 import AppError from "../utils/appError.js";
 import { verfiyToken } from "../utils/authTokens.js";
 import User from "../models/user.model.js";
+import Express from "../types/express.d.js";
+import IUser from "../types/user.interface.js";
 
 export const checkAuth = async (
-  req: any,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
@@ -24,11 +26,11 @@ export const checkAuth = async (
   const decoded = verfiyToken(token, {});
 
   // user existance
-  const currUser = await User.findById((decoded as any).id);
+  const currUser = await User.findById((decoded as any).id) as IUser;
   if (!currUser) return next(new AppError("Non-existent User !", 401));
 
   // check if password changed after issuing the jwt
-  if ((currUser as any).changedPasswordAfter((decoded as any).iat)) {
+  if (currUser.changedPasswordAfter((decoded as any).iat)) {
     return next(new AppError("Login Session Expired, Login Again !", 401));
   }
 

@@ -1,6 +1,6 @@
 import router from 'express';
-import laptopRouter from './laptop.routes.js';
-import userRouter from './user.routes.js'
+import laptopRouter from './laptop.router.js';
+import userRouter from './user.router.js'
 
 const indexRouter = router.Router();
 
